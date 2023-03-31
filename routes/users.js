@@ -1,5 +1,4 @@
 
-// const { request } = require('express');
 let NeDB = require('nedb');
 
 let db = new NeDB({
@@ -39,15 +38,7 @@ module.exports = (app) => {
 
     route.post((req, res) => {
 
-        req.assert('name', 'O Nome é obrigatório.').notEmpty();
-        req.assert('email', 'O e-mail está inválido.').notEmpty().isEmail();
-
-        let errors = req.validationErrors();
-
-        if (errors) {
-            app.utils.error.send(errors, req, res);
-            return false;
-        }
+        if (!app.utils.validator.user(app, req, res)) return false;
 
         db.insert(req.body, (err, user) => {
 
@@ -84,6 +75,8 @@ module.exports = (app) => {
     });
 
     routeID.put((req, res) => {
+
+        if (!app.utils.validator.user(app, req, res)) return false;
 
         db.update({ _id: req.params.id }, req.body, err => {
 
